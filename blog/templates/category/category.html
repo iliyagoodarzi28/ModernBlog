@@ -1,0 +1,55 @@
+{# templates/category/category.html #}
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}{{ category.title }}{% endblock %}
+
+{% block content %}
+<section class="category-detail container">
+  <!-- Category Header -->
+  <header class="category-header">
+    <h1 class="category-title">{{ category.title }}</h1>
+    {% if category.img %}
+      <img
+        src="{{ category.img.url }}"
+        alt="{{ category.title }}"
+        class="category-image"
+      />
+    {% endif %}
+  </header>
+
+  <!-- Posts in This Category -->
+  <div class="posts-grid">
+    {% for post in category.Blogs.all %}
+      <article class="post-card">
+        <a href="{% url 'blog:detail' post.slug %}" class="post-thumb">
+          {% if post.img %}
+            <img src="{{ post.img.url }}" alt="{{ post.title }}">
+          {% else %}
+            <img
+              src="{% static 'images/default-post.jpg' %}"
+              alt="{{ post.title }}"
+            >
+          {% endif %}
+        </a>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="{% url 'blog:detail' post.slug %}">{{ post.title }}</a>
+          </h2>
+          <p class="post-excerpt">
+            {{ post.description|truncatewords:20 }}
+          </p>
+          <a
+            href="{% url 'blog:detail' post.slug %}"
+            class="btn-read-more"
+          >Read More</a>
+        </div>
+      </article>
+    {% empty %}
+      <p class="no-posts">
+        There are no posts in this category yet.
+      </p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

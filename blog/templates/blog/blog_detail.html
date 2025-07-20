@@ -1,0 +1,42 @@
+{# templates/blog/blog_detail.html #}
+{% extends "master.html" %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block content %}
+<section class="post-detail container">
+  <article class="post-article">
+    <header class="post-header">
+      <h1 class="post-title">{{ blog.title }}</h1>
+      <div class="post-meta">
+        <time datetime="{{ blog.date|date:'c' }}" class="post-date">
+          {{ blog.date|date:"F j, Y" }}
+        </time>
+        <span class="post-category">
+          in <a href="{% url 'blog:category_detail' blog.category.slug %}">
+            {{ blog.category.title }}
+          </a>
+        </span>
+      </div>
+    </header>
+
+    {% if blog.img %}
+    <figure class="post-image-wrap">
+      <img
+        src="{{ blog.img.url }}"
+        alt="{{ blog.title }}"
+        class="post-image"
+      />
+    </figure>
+    {% endif %}
+
+    <div class="post-content">
+      {{ description_html|safe }}
+    </div>
+
+    <footer class="post-footer">
+      <a href="{% url 'blog:blog_list' %}" class="btn-back">← Back to Posts</a>
+    </footer>
+  </article>
+</section>
+{% endblock %}

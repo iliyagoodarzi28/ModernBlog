@@ -1,0 +1,33 @@
+{# templates/blog/categories.html #}
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<section class="category-list container">
+  <h1 class="section-title">Categories</h1>
+
+  <div class="categories-grid">
+    {% for category in categories %}
+      <article class="category-card">
+        <a href="#" class="category-thumb">
+          {% if category.img %}
+            <img src="{{ category.img.url }}" alt="{{ category.title }}">
+          {% else %}
+            <img src="#"
+                 alt="{{ category.title }}">
+          {% endif %}
+        </a>
+        <h2 class="category-title">
+          <a href="{% url 'blog:category_detail' category.slug %}">{{ category.title }}</a>
+        </h2>
+        <a href="{% url 'blog:category_detail' category.slug %}"
+           class="btn-view-posts">View Posts</a>
+      </article>
+    {% empty %}
+      <p class="no-categories">No categories found.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
