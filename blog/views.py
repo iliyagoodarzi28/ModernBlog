@@ -17,6 +17,11 @@ class BlogListView(ListView):
     context_object_name = 'blogs'
 
 
+    def get_queryset(self):
+        return Blog.active_objects.all()
+
+
+
 
 class BlogDetailView(DetailView):
     model = Blog
@@ -29,6 +34,11 @@ class BlogDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['description_html'] = mark_safe(markdown.markdown(self.object.description))
         return context
+
+    def get_object(self):
+        obj = super().get_object()
+        obj.increment_views()
+        return obj
 
 
 
