@@ -27,10 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,7 +43,10 @@ INSTALLED_APPS = [
     'site_info.apps.SiteInfoConfig',
     'blog.apps.BlogConfig',
     'markdownx',
-    'contact.apps.ContactConfig'
+    'contact.apps.ContactConfig',
+    'accounts.apps.AccountsConfig',
+    "widget_tweaks",
+
 
 ]
 
@@ -121,9 +126,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # مسیر static در اپ core
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -137,4 +145,8 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = 'accounts:login'  # یا مسیر URL name که خودت برای login تعریف کردی
+LOGOUT_REDIRECT_URL = 'home'  # یا هر صفحه‌ای که می‌خوای بعد logout بره
+
 

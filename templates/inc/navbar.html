@@ -1,17 +1,24 @@
+<nav class="navbar">
+  <div class="brand">{{ site_info.name }}</div>
 
-  <nav class="navbar">
-    <div class="brand">{{site_info.name}}</div>
+  <!-- Hamburger toggle for mobile -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <label for="nav-toggle" class="nav-toggle-label">
+    <span></span>
+  </label>
 
-    <!-- Hamburger toggle for mobile -->
-    <input type="checkbox" id="nav-toggle" class="nav-toggle">
-    <label for="nav-toggle" class="nav-toggle-label">
-      <span></span>
-    </label>
+  <ul class="nav-menu">
+    <li><a href="{% url 'main:main' %}">Home</a></li>
+    <li><a href="{% url 'main:about' %}">About</a></li>
+    <li><a href="{% url 'blog:blog_list' %}">Blog</a></li>
+    <li><a href="{% url 'contact:contact' %}">Contact</a></li>
 
-    <ul class="nav-menu">
-      <li><a href="{% url 'main:main' %}">Home</a></li>
-      <li><a href="{% url 'main:about' %}">About</a></li>
-      <li><a href="{% url 'blog:blog_list' %}">Blog</a></li>
-      <li><a href="{% url 'contact:contact' %}">Contact</a></li>
-    </ul>
-  </nav>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+
+    {% else %}
+      <li><a href="{% url 'accounts:login' %}">Login</a></li>
+      <li><a href="{% url 'accounts:register' %}">Register</a></li>
+    {% endif %}
+  </ul>
+</nav>

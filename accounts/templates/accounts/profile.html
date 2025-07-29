@@ -1,0 +1,35 @@
+{% extends "master.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-white">
+    {% if user.avatar %}
+    <img src="{{ user.avatar.url }}" alt="Avatar" width="150" height="150" style="border-radius: 50%;">
+    {% else %}
+    <p>No profile picture set.</p>
+    {% endif %}
+
+    <h1 class="mb-4">User Profile</h1>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Full Name:</strong> {{ user.full_name }}</p>
+    <p><strong>Phone:</strong> {{ user.phone }}</p>
+    <p><strong>Gender:</strong> {{ user.get_gender_display }}</p>
+    <p><strong>Birth Date:</strong> {{ user.birth_date }}</p>
+    <p><strong>Date Joined:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+
+    <br>
+ 
+<form method="get" action="{% url 'accounts:profile_edit' %}" style="display:inline;">
+    <button type="submit" class="btn btn-danger">Edit Profile</button>
+</form>
+
+<form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Logout As Account</button>
+</form>
+
+
+</div>
+{% endblock %}
