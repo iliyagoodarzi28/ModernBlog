@@ -33,10 +33,58 @@
     <div class="post-content">
       {{ description_html|safe }}
     </div>
+    <section class="comments-section mt-5">
+      <div class="comments-list mb-5">
+        <h4 class="mb-4" style="color: #111;">Comments <span style="color: #c00;">({{ blog.comments.count }})</span></h4>
+        {% if blog.comments.all %}
+          <ul class="list-unstyled">
+            {% for comment in blog.comments.all %}
+              <li class="media mb-4 p-3 border rounded" style="background: #111; border-color: #c00;">
+                <div class="media-body">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="comment-author" style="color: #c00;">
+                      {{ comment.name|default:comment.user.get_username }}
+                    </strong>
+                    <small class="text-muted" style="color: #c00;">
+                      {{ comment.created_at|date:"M d, Y H:i" }}
+                    </small>
+                  </div>
+                  <div class="comment-content" style="color: #fff;">
+                    {{ comment.content|linebreaksbr }}
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted" style="color: #c00;">No comments yet. Be the first to comment!</p>
+        {% endif %}
+      </div>
+
+      <div class="comment-form">
+        <h4 class="mb-3" style="color: #111;">Leave a <span style="color: #c00;">Comment</span></h4>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'blog:comment_create' blog.slug %}" class="p-4 border rounded" style="background: #111; border-color: #c00;">
+            {% csrf_token %}
+            <div style="color: #fff;">
+              {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn" style="background: #c00; color: #fff;">Send Comment</button>
+          </form>
+        {% else %}
+          <div class="alert" style="background: #111; color: #c00; border: 1px solid #c00;">
+            You must <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color: #c00; text-decoration: underline;">login</a> to comment.
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+
 
     <footer class="post-footer">
       <a href="{% url 'blog:blog_list' %}" class="btn-back">← Back to Posts</a>
     </footer>
+
   </article>
 </section>
 {% endblock %}

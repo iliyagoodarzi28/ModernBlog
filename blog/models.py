@@ -1,6 +1,12 @@
 from django.db import models
 from markdownx.models import MarkdownxField
 from .managers import ActiveManager
+from django.db import models
+from django.conf import settings
+from django.urls import reverse
+
+
+
 
 class BaseModel(models.Model):
     title = models.CharField(max_length=225 , verbose_name="Title")
@@ -58,7 +64,54 @@ class Blog(BaseModel):
         self.views += 1
         self.save()
 
+    def get_absolute_url(self):
+        return reverse('blog:detail', kwargs={'slug': self.slug})
+    
+
 
     class Meta(BaseModel.Meta):
         verbose_name = 'Blog'
         verbose_name_plural = 'Blogs'
+
+
+
+
+
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='User'
+    )
+    blog = models.ForeignKey(
+        'Blog', 
+        on_delete=models.CASCADE, 
+        related_name='comments',
+        verbose_name='Blog'
+    )
+    content = models.TextField(verbose_name='Content')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
+
+    # Optional cache fields for faster template rendering
+    name = models.CharField(max_length=255, blank=True, verbose_name='Name')
+    email = models.EmailField(blank=True, verbose_name='Email')
+
+    def save(self, *args, **kwargs):
+        # If name or email are empty, fill from user profile
+        if self.user:
+            if not self.name:
+                self.name = getattr(self.user, 'full_name', '') or getattr(self.user, 'username', '')
+            if not self.email:
+                self.email = getattr(self.user, 'email', '')
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Comment by {self.name or self.user} on {self.blog}"
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+

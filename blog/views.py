@@ -1,9 +1,10 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView , CreateView
 from django.utils.safestring import mark_safe
-from .models import Blog, Category
+from .models import Blog, Category , Comment
 import markdown
 from django.db.models import Q
-
+from accounts.mixins import AuthenticatedAccessMixin
+from .forms import CommentForm
 
 
 
@@ -61,6 +62,7 @@ class BlogDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         description = getattr(self.object, 'description', '')
         context['description_html'] = mark_safe(markdown.markdown(description))
+        context['form'] = CommentForm()
         return context
 
     def get_object(self, queryset=None):
@@ -86,3 +88,38 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+
+
+
+class CommentCreateView(AuthenticatedAccessMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.blog = Blog.objects.get(slug=self.kwargs['slug'])  # یا pk
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.blog.get_absolute_url()
+
+
+class BlogDetailView(DetailView):
+    model = Blog
+    template_name = 'blog/blog_detail.html'
+    context_object_name = 'blog'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        description = getattr(self.object, 'description', '')
+        context['description_html'] = mark_safe(markdown.markdown(description))
+        context['form'] = CommentForm()
+        return context
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if hasattr(obj, 'increment_views'):
+            obj.increment_views()
+        return obj
