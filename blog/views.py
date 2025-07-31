@@ -5,10 +5,12 @@ import markdown
 from django.db.models import Q
 from accounts.mixins import AuthenticatedAccessMixin
 from .forms import CommentForm
+from .utils import filter_and_sort_blogs
+from .mixins import SearchAndSortContextMixin
 
 
 
-class BlogListView(ListView):
+class BlogListView(SearchAndSortContextMixin , ListView):
     model = Blog
     template_name = 'blog/blog.html'
     ordering = ['-date']
@@ -19,33 +21,7 @@ class BlogListView(ListView):
 
     def get_queryset(self):
         queryset = Blog.active_objects.all()
-
-        # Search
-        query = self.request.GET.get('q', '').strip()
-        if query:
-            queryset = queryset.filter(
-                Q(title__icontains=query) |
-                Q(description__icontains=query)
-            )
-
-        # Sort
-        sort_by = self.request.GET.get('sort')
-        if sort_by == 'new':
-            queryset = queryset.order_by('-date')
-        elif sort_by == 'old':
-            queryset = queryset.order_by('date')
-        elif sort_by == 'popular':
-            queryset = queryset.order_by('-views')
-        else:
-            queryset = queryset.order_by('-date')  # پیش‌فرض
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = self.request.GET.get('q', '')
-        context['sort'] = self.request.GET.get('sort', 'new')
-        return context
+        return filter_and_sort_blogs(queryset, self.request)
 
 
         

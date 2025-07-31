@@ -1,9 +1,10 @@
 from django.db import models
 from markdownx.models import MarkdownxField
-from .managers import ActiveManager
+from .managers import ActiveManager , DeletedManager
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from .utils import blog_comment_info 
 
 
 
@@ -18,6 +19,7 @@ class BaseModel(models.Model):
 
     objects = models.Manager()
     active_objects = ActiveManager()
+    delete_objects = DeletedManager()
     
 
     class Meta:
@@ -26,7 +28,6 @@ class BaseModel(models.Model):
 
     def __str__(self):
         return self.title    
-        
 
     
 
@@ -100,12 +101,7 @@ class Comment(models.Model):
     email = models.EmailField(blank=True, verbose_name='Email')
 
     def save(self, *args, **kwargs):
-        # If name or email are empty, fill from user profile
-        if self.user:
-            if not self.name:
-                self.name = getattr(self.user, 'full_name', '') or getattr(self.user, 'username', '')
-            if not self.email:
-                self.email = getattr(self.user, 'email', '')
+        blog_comment_info(self)
         super().save(*args, **kwargs)
 
     def __str__(self):
