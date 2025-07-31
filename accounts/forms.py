@@ -29,6 +29,7 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label="Email")  # Use email instead of username
 
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser

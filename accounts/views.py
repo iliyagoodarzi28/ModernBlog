@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .utils import calculate_age
 
 
 class CustomLoginView(LoginView):
@@ -53,6 +54,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
+        context['age'] = calculate_age(self.request.user.birth_date) if self.request.user.birth_date else None
         return context
 
 
