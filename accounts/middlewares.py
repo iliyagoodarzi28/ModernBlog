@@ -8,4 +8,3 @@ class BlockInactiveUsersMiddleware:
             from django.http import HttpResponseForbidden
             return HttpResponseForbidden("Your account is inactive.")
         return self.get_response(request)
-
