@@ -16,4 +16,18 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
+
+
+class Newsletter(models.Model):
+    email = models.EmailField(unique=True, verbose_name='Email')
+    subscribed_at = models.DateTimeField(auto_now_add=True, verbose_name='Subscription Date')
+    is_active = models.BooleanField(default=True, verbose_name='Active')
+
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = 'Newsletter Subscription'
+        verbose_name_plural = 'Newsletter Subscriptions'
+
+    def __str__(self):
+        return self.email
     

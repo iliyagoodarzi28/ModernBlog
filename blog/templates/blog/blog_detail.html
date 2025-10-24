@@ -1,90 +1,568 @@
-{# templates/blog/blog_detail.html #}
-{% extends "master.html" %}
+{% extends 'master.html' %}
+{% load static %}
 
-{% block title %}{{ blog.title }}{% endblock %}
+{% block title %}{{ blog.title }} - ModernBlog{% endblock %}
+
+{% block meta_description %}{{ blog.get_excerpt|truncatewords:20 }}{% endblock %}
+
+{% block og_title %}{{ blog.title }}{% endblock %}
+{% block og_description %}{{ blog.get_excerpt|truncatewords:20 }}{% endblock %}
+{% block og_image %}{% if blog.img %}{{ blog.img.url }}{% endif %}{% endblock %}
 
 {% block content %}
-<section class="post-detail container">
-  <article class="post-article">
-    <header class="post-header">
-      <h1 class="post-title">{{ blog.title }}</h1>
-      <div class="post-meta">
-        <time datetime="{{ blog.date|date:'c' }}" class="post-date">
-          {{ blog.date|date:"F j, Y" }}
-        </time>
-        <span class="post-category">
-          in <a href="{% url 'blog:category_detail' blog.category.slug %}">
-            {{ blog.category.title }}
-          </a>
-        </span>
-      </div>
-    </header>
+<!-- Article Header -->
+<section class="article-header py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'main:home' %}" class="text-decoration-none text-muted">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'blog:list' %}" class="text-decoration-none text-muted">Stories</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'blog:category_detail' blog.category.slug %}" class="text-decoration-none text-muted">{{ blog.category.title }}</a>
+                        </li>
+                    </ol>
+                </nav>
 
-    {% if blog.img %}
-    <figure class="post-image-wrap">
-      <img
-        src="{{ blog.img.url }}"
-        alt="{{ blog.title }}"
-        class="post-image"
-      />
-    </figure>
-    {% endif %}
-
-    <div class="post-content">
-      {{ description_html|safe }}
-    </div>
-    <section class="comments-section mt-5">
-      <div class="comments-list mb-5">
-        <h4 class="mb-4" style="color: #111;">Comments <span style="color: #c00;">({{ blog.comments.count }})</span></h4>
-        {% if blog.comments.all %}
-          <ul class="list-unstyled">
-            {% for comment in blog.comments.all %}
-              <li class="media mb-4 p-3 border rounded" style="background: #111; border-color: #c00;">
-                <div class="media-body">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <strong class="comment-author" style="color: #c00;">
-                      {{ comment.name|default:comment.user.get_username }}
-                    </strong>
-                    <small class="text-muted" style="color: #c00;">
-                      {{ comment.created_at|date:"M d, Y H:i" }}
-                    </small>
-                  </div>
-                  <div class="comment-content" style="color: #fff;">
-                    {{ comment.content|linebreaksbr }}
-                  </div>
+                <!-- Article Meta -->
+                <div class="article-meta mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if blog.author.avatar %}
+                        <img src="{{ blog.author.avatar.url }}" alt="{{ blog.author.username }}" 
+                             class="rounded-circle me-3" width="48" height="48">
+                        {% else %}
+                        <div class="author-avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 48px; height: 48px;">
+                            {{ blog.author.username|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <div class="author-name fw-bold">{{ blog.author.get_full_name|default:blog.author.username }}</div>
+                            <div class="article-date text-muted">{{ blog.created_at|date:"M d, Y" }} · {{ blog.views }} views</div>
+                        </div>
+                    </div>
                 </div>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-muted" style="color: #c00;">No comments yet. Be the first to comment!</p>
-        {% endif %}
-      </div>
 
-      <div class="comment-form">
-        <h4 class="mb-3" style="color: #111;">Leave a <span style="color: #c00;">Comment</span></h4>
-        {% if user.is_authenticated %}
-          <form method="post" action="{% url 'blog:comment_create' blog.slug %}" class="p-4 border rounded" style="background: #111; border-color: #c00;">
-            {% csrf_token %}
-            <div style="color: #fff;">
-              {{ form.as_p }}
+                <!-- Article Title -->
+                <h1 class="article-title fw-bold mb-4">{{ blog.title }}</h1>
+
+                <!-- Article Subtitle -->
+                {% if blog.get_excerpt %}
+                <p class="article-subtitle text-muted mb-4">{{ blog.get_excerpt }}</p>
+                {% endif %}
+
+                <!-- Article Actions -->
+                <div class="article-actions d-flex align-items-center gap-3 mb-4">
+                    <div class="action-buttons d-flex gap-2">
+                        {% if user.is_authenticated %}
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="toggleLike()">
+                            <i class="fas fa-heart me-1"></i>Like
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="toggleBookmark()">
+                            <i class="fas fa-bookmark me-1"></i>Save
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="social-share">
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="shareOnTwitter()">
+                            <i class="fab fa-twitter me-1"></i>Share
+                        </button>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn" style="background: #c00; color: #fff;">Send Comment</button>
-          </form>
-        {% else %}
-          <div class="alert" style="background: #111; color: #c00; border: 1px solid #c00;">
-            You must <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color: #c00; text-decoration: underline;">login</a> to comment.
-          </div>
-        {% endif %}
-      </div>
-    </section>
-
-
-
-    <footer class="post-footer">
-      <a href="{% url 'blog:blog_list' %}" class="btn-back">← Back to Posts</a>
-    </footer>
-
-  </article>
+        </div>
+    </div>
 </section>
+
+<!-- Article Content -->
+<section class="article-content py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Featured Image -->
+                {% if blog.img %}
+                <div class="featured-image mb-5">
+                    <img src="{{ blog.img.url }}" alt="{{ blog.title }}" 
+                         class="img-fluid rounded">
+                </div>
+                {% endif %}
+
+                <!-- Article Body -->
+                <div class="article-body">
+                    {{ blog.content|safe }}
+                </div>
+
+                <!-- Article Tags -->
+                {% if blog.tags.all %}
+                <div class="article-tags mt-5 pt-4 border-top">
+                    <div class="tags-list">
+                        {% for tag in blog.tags.all %}
+                        <span class="tag-item">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Article Footer -->
+                <div class="article-footer mt-5 pt-4 border-top">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="author-info d-flex align-items-center">
+                                {% if blog.author.avatar %}
+                                <img src="{{ blog.author.avatar.url }}" alt="{{ blog.author.username }}" 
+                                     class="rounded-circle me-3" width="60" height="60">
+                                {% else %}
+                                <div class="author-avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 60px; height: 60px;">
+                                    {{ blog.author.username|first|upper }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div class="author-name fw-bold">{{ blog.author.get_full_name|default:blog.author.username }}</div>
+                                    <div class="author-bio text-muted small">
+                                        {% if blog.author.bio %}
+                                            {{ blog.author.bio|truncatewords:20 }}
+                                        {% else %}
+                                            Writer on ModernBlog
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <div class="article-stats">
+                                <small class="text-muted me-3">{{ blog.views }} views</small>
+                                <small class="text-muted me-3">{{ blog.comments.count }} responses</small>
+                                <small class="text-muted">{{ blog.likes.count }} likes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Comments Section -->
+<section class="comments-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h4 class="comments-title fw-bold mb-4">
+                    {{ blog.comments.count }} responses
+                </h4>
+
+                <!-- Add Comment Form -->
+                {% if user.is_authenticated %}
+                <div class="add-comment mb-5">
+                    <form method="post" action="{% url 'blog:add_comment' blog.slug %}">
+                        {% csrf_token %}
+                        <div class="comment-form">
+                            <div class="comment-input">
+                                <textarea name="content" class="form-control border-0" rows="4" 
+                                          placeholder="What are your thoughts?" required></textarea>
+                            </div>
+                            <div class="comment-submit mt-3">
+                                <button type="submit" class="btn btn-dark rounded-pill px-4">
+                                    Respond
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="login-prompt mb-5">
+                    <div class="text-center">
+                        <h6 class="fw-bold mb-2">Join the conversation</h6>
+                        <p class="text-muted mb-3">Sign in to leave a response and engage with the community.</p>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-dark me-2">Sign in</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-dark">Get started</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    {% for comment in blog.comments.all %}
+                    <div class="comment-item mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            {% if comment.author.avatar %}
+                            <img src="{{ comment.author.avatar.url }}" alt="{{ comment.author.username }}" 
+                                 class="rounded-circle" width="40" height="40">
+                            {% else %}
+                            <div class="comment-avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px;">
+                                {{ comment.author.username|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="comment-header d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ comment.author.get_full_name|default:comment.author.username }}</h6>
+                                        <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                                    </div>
+                                    {% if user == comment.author %}
+                                    <div class="comment-actions">
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteComment({{ comment.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <p class="comment-content mb-0">{{ comment.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-comments text-center py-4">
+                        <h5 class="text-muted">No responses yet</h5>
+                        <p class="text-muted">Be the first to share your thoughts!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Stories -->
+<section class="related-stories py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h4 class="fw-bold mb-4">More from {{ blog.category.title }}</h4>
+                <div class="related-posts">
+                    {% for related_post in related_posts %}
+                    <div class="related-post mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="related-content">
+                                    <div class="related-author mb-2">
+                                        <img src="{% if related_post.author.avatar %}{{ related_post.author.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                             alt="{{ related_post.author.username }}" class="rounded-circle me-2" width="20" height="20">
+                                        <small class="text-muted">{{ related_post.author.get_full_name|default:related_post.author.username }}</small>
+                                    </div>
+                                    <h6 class="related-title fw-bold mb-2">
+                                        <a href="{% url 'blog:detail' related_post.slug %}" class="text-decoration-none text-dark">
+                                            {{ related_post.title }}
+                                        </a>
+                                    </h6>
+                                    <div class="related-meta">
+                                        <small class="text-muted">{{ related_post.created_at|date:"M d" }} · {{ related_post.views }} views</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if related_post.img %}
+                            <div class="col-md-4">
+                                <div class="related-image">
+                                    <img src="{{ related_post.img.url }}" alt="{{ related_post.title }}" class="img-fluid rounded">
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.article-header {
+    background-color: var(--background-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.article-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    color: var(--text-primary);
+    font-weight: 800;
+}
+
+.article-subtitle {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.article-content {
+    background-color: var(--background-primary);
+}
+
+.article-body {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.article-body p {
+    margin-bottom: 1.5rem;
+}
+
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.article-body blockquote {
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    background-color: var(--gray-50);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+}
+
+.article-body code {
+    background-color: var(--gray-100);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.article-body pre {
+    background-color: var(--gray-900);
+    color: var(--gray-100);
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+.article-body pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+.featured-image img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.article-tags {
+    padding-top: 2rem;
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-item {
+    background-color: var(--gray-100);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.article-footer {
+    padding-top: 2rem;
+}
+
+.author-info {
+    padding: 1rem;
+    background-color: var(--gray-50);
+    border-radius: 8px;
+}
+
+.comments-section {
+    background-color: var(--background-secondary);
+}
+
+.comments-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.comment-form {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.comment-input textarea {
+    background-color: transparent;
+    font-size: 1rem;
+    resize: none;
+}
+
+.comment-input textarea:focus {
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.comment-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.related-stories {
+    background-color: var(--background-primary);
+}
+
+.related-post {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.related-post:last-child {
+    border-bottom: none;
+}
+
+.related-title a {
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.related-title a:hover {
+    color: var(--accent-color);
+}
+
+.related-image img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+}
+
+.action-buttons .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+.social-share .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+@media (max-width: 768px) {
+    .article-title {
+        font-size: 2rem;
+    }
+    
+    .article-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .article-body {
+        font-size: 1rem;
+    }
+    
+    .article-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .article-footer .row {
+        flex-direction: column;
+    }
+    
+    .article-stats {
+        text-align: left !important;
+        margin-top: 1rem;
+    }
+    
+    .related-post .row {
+        flex-direction: column-reverse;
+    }
+    
+    .related-image {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleLike() {
+    // Implement like functionality
+    console.log('Toggle like');
+}
+
+function toggleBookmark() {
+    // Implement bookmark functionality
+    console.log('Toggle bookmark');
+}
+
+function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('{{ blog.title|escapejs }}');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank', 'width=600,height=400');
+}
+
+function deleteComment(commentId) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        // Implement comment deletion
+        console.log('Delete comment:', commentId);
+    }
+}
+
+// Reading progress indicator
+document.addEventListener('DOMContentLoaded', function() {
+    const articleBody = document.querySelector('.article-body');
+    if (articleBody) {
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background-color: var(--accent-color);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        `;
+        document.body.appendChild(progressBar);
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            progressBar.style.width = scrollPercent + '%';
+        });
+    }
+});
+</script>
 {% endblock %}

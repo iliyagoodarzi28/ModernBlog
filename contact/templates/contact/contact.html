@@ -1,13 +1,524 @@
 {% extends 'master.html' %}
-{% block title %}Contact Us{% endblock %}
+{% load static %}
+
+{% block title %}Contact Us - ModernBlog{% endblock %}
+
+{% block meta_description %}Get in touch with the ModernBlog team. We'd love to hear from you! Send us your questions, feedback, or suggestions.{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="text-center mb-4">Contact Us</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-2">Send Message</button>
-    </form>
-</div>
+<!-- Contact Header -->
+<section class="contact-header py-5 bg-gradient-primary text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-envelope me-3"></i>Get in Touch
+                </h1>
+                <p class="lead mb-0">
+                    We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Content -->
+<section class="contact-content py-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="contact-form-card card border-0 shadow-lg">
+                    <div class="card-header bg-white border-bottom">
+                        <h3 class="fw-bold mb-0">
+                            <i class="fas fa-paper-plane me-2 text-primary"></i>Send us a Message
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row g-3">
+                                <!-- Name Field -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-user me-2 text-primary"></i>{{ form.name.label }}
+                                    </label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Email Field -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>{{ form.email.label }}
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Subject Field -->
+                                <div class="col-12">
+                                    <label for="{{ form.subject.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-tag me-2 text-primary"></i>{{ form.subject.label }}
+                                    </label>
+                                    {{ form.subject }}
+                                    {% if form.subject.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.subject.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Category Field -->
+                                {% if form.category %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-list me-2 text-primary"></i>{{ form.category.label }}
+                                    </label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.category.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Priority Field -->
+                                {% if form.priority %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.priority.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-exclamation-circle me-2 text-primary"></i>{{ form.priority.label }}
+                                    </label>
+                                    {{ form.priority }}
+                                    {% if form.priority.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.priority.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Message Field -->
+                                <div class="col-12">
+                                    <label for="{{ form.message.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-comment me-2 text-primary"></i>{{ form.message.label }}
+                                    </label>
+                                    {{ form.message }}
+                                    {% if form.message.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.message.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Please provide as much detail as possible</div>
+                                </div>
+                                
+                                <!-- Newsletter Subscription -->
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subscribe_newsletter" id="subscribeNewsletter">
+                                        <label class="form-check-label" for="subscribeNewsletter">
+                                            Subscribe to our newsletter for updates and news
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <!-- Contact Info Card -->
+                <div class="contact-info-card card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fas fa-info-circle me-2 text-info"></i>Contact Information
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="contact-info-list">
+                            <div class="contact-item d-flex align-items-start gap-3 mb-4">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope fa-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Email</h6>
+                                    <p class="text-muted mb-0">contact@modernblog.com</p>
+                                    <small class="text-muted">We'll respond within 24 hours</small>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item d-flex align-items-start gap-3 mb-4">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone fa-lg text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Phone</h6>
+                                    <p class="text-muted mb-0">+1 (555) 123-4567</p>
+                                    <small class="text-muted">Mon-Fri 9AM-6PM EST</small>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item d-flex align-items-start gap-3 mb-4">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt fa-lg text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Address</h6>
+                                    <p class="text-muted mb-0">
+                                        123 Tech Street<br>
+                                        San Francisco, CA 94105<br>
+                                        United States
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item d-flex align-items-start gap-3">
+                                <div class="contact-icon">
+                                    <i class="fas fa-clock fa-lg text-info"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Business Hours</h6>
+                                    <p class="text-muted mb-0">
+                                        Monday - Friday: 9:00 AM - 6:00 PM<br>
+                                        Saturday: 10:00 AM - 4:00 PM<br>
+                                        Sunday: Closed
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media Card -->
+                <div class="social-media-card card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fas fa-share-alt me-2 text-primary"></i>Follow Us
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="social-links">
+                            <a href="#" class="social-link btn btn-outline-primary w-100 mb-2">
+                                <i class="fab fa-facebook-f me-2"></i>Facebook
+                            </a>
+                            <a href="#" class="social-link btn btn-outline-info w-100 mb-2">
+                                <i class="fab fa-twitter me-2"></i>Twitter
+                            </a>
+                            <a href="#" class="social-link btn btn-outline-danger w-100 mb-2">
+                                <i class="fab fa-instagram me-2"></i>Instagram
+                            </a>
+                            <a href="#" class="social-link btn btn-outline-primary w-100 mb-2">
+                                <i class="fab fa-linkedin-in me-2"></i>LinkedIn
+                            </a>
+                            <a href="#" class="social-link btn btn-outline-dark w-100">
+                                <i class="fab fa-github me-2"></i>GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ Card -->
+                <div class="faq-card card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fas fa-question-circle me-2 text-warning"></i>Quick FAQ
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item border-0">
+                                <h6 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                        How quickly do you respond?
+                                    </button>
+                                </h6>
+                                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        We typically respond to all inquiries within 24 hours during business days.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item border-0">
+                                <h6 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                        Can I suggest new features?
+                                    </button>
+                                </h6>
+                                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Absolutely! We love hearing from our users. Please use the "Feature Request" category.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item border-0">
+                                <h6 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                        Do you offer technical support?
+                                    </button>
+                                </h6>
+                                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, we provide technical support for all users. Select "Technical Support" as the category.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="map-card card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fas fa-map me-2 text-success"></i>Find Us
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="map-placeholder bg-primary text-white d-flex align-items-center justify-content-center" style="height: 300px;">
+                            <div class="text-center">
+                                <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
+                                <h5>Interactive Map</h5>
+                                <p class="mb-0">123 Tech Street, San Francisco, CA 94105</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.contact-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.contact-form-card,
+.contact-info-card,
+.social-media-card,
+.faq-card,
+.map-card {
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+}
+
+.contact-form-card:hover,
+.contact-info-card:hover,
+.social-media-card:hover,
+.faq-card:hover,
+.map-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-lg);
+}
+
+.form-control {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.contact-item {
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateX(5px);
+}
+
+.contact-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--gray-100);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover .contact-icon {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.social-link {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+}
+
+.accordion-button {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.map-placeholder {
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+@media (max-width: 768px) {
+    .contact-content .row {
+        flex-direction: column-reverse;
+    }
+    
+    .contact-item {
+        text-align: center;
+    }
+    
+    .contact-icon {
+        margin: 0 auto;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input[required], textarea[required]');
+    
+    // Real-time validation
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim() !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            showNotification('Please fill in all required fields correctly', 'error');
+        }
+    });
+});
+
+function validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+    
+    // Required field validation
+    if (field.hasAttribute('required') && value === '') {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        isValid = false;
+    } else if (value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    }
+    
+    // Email validation
+    if (field.type === 'email' && value !== '') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+            isValid = false;
+        }
+    }
+    
+    return isValid;
+}
+
+// Character counter for message field
+document.addEventListener('DOMContentLoaded', function() {
+    const messageField = document.querySelector('textarea[name="message"]');
+    if (messageField) {
+        const maxLength = 1000;
+        const counter = document.createElement('div');
+        counter.className = 'form-text text-end';
+        counter.innerHTML = `<span id="messageCount">0</span>/${maxLength} characters`;
+        messageField.parentNode.appendChild(counter);
+        
+        messageField.addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('messageCount').textContent = count;
+            
+            if (count > maxLength) {
+                counter.classList.add('text-danger');
+                this.classList.add('is-invalid');
+            } else {
+                counter.classList.remove('text-danger');
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

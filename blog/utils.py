@@ -11,13 +11,13 @@ def filter_and_sort_blogs(queryset, request):
 
     sort_by = request.GET.get('sort')
     if sort_by == 'new':
-        queryset = queryset.order_by('-date')
+        queryset = queryset.order_by('-created_at')
     elif sort_by == 'old':
-        queryset = queryset.order_by('date')
+        queryset = queryset.order_by('created_at')
     elif sort_by == 'popular':
         queryset = queryset.order_by('-views')
     else:
-        queryset = queryset.order_by('-date')
+        queryset = queryset.order_by('-created_at')
 
     return queryset
 

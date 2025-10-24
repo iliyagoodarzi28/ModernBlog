@@ -1,24 +1,93 @@
-<nav class="navbar">
-  <div class="brand">{{ site_info.name }}</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <div class="container">
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" href="{% url 'main:home' %}">
+            ModernBlog
+        </a>
 
-  <!-- Hamburger toggle for mobile -->
-  <input type="checkbox" id="nav-toggle" class="nav-toggle">
-  <label for="nav-toggle" class="nav-toggle-label">
-    <span></span>
-  </label>
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-  <ul class="nav-menu">
-    <li><a href="{% url 'main:main' %}">Home</a></li>
-    <li><a href="{% url 'main:about' %}">About</a></li>
-    <li><a href="{% url 'blog:blog_list' %}">Blog</a></li>
-    <li><a href="{% url 'contact:contact' %}">Contact</a></li>
+        <!-- Navigation Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'main:home' %}">
+                        Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'blog' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'blog:list' %}">
+                        Stories
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Topics
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                        {% for category in categories %}
+                        <li><a class="dropdown-item" href="{% url 'blog:category_detail' category.slug %}">{{ category.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
 
-    {% if user.is_authenticated %}
-      <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+            <!-- Search Form -->
+            <form class="d-flex me-3" method="get" action="{% url 'blog:search' %}">
+                <div class="input-group">
+                    <input class="form-control form-control-sm border-0 bg-light" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-secondary btn-sm border-0" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
 
-    {% else %}
-      <li><a href="{% url 'accounts:login' %}">Login</a></li>
-      <li><a href="{% url 'accounts:register' %}">Register</a></li>
-    {% endif %}
-  </ul>
+            <!-- User Menu -->
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-2" width="24" height="24">
+                            {% else %}
+                                <div class="user-avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">
+                                Settings
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                Sign out
+                            </a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            Sign in
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-dark btn-sm rounded-pill px-3" href="{% url 'accounts:register' %}">
+                            Get started
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 </nav>
+
+<!-- Spacer for fixed navbar -->
+<div class="navbar-spacer"></div>

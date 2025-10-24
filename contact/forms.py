@@ -1,5 +1,5 @@
 from django import forms
-from .models import ContactMessage
+from .models import ContactMessage, Newsletter
 
 
 class ContactForm(forms.ModelForm):
@@ -13,3 +13,15 @@ class ContactForm(forms.ModelForm):
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Your message'}),
         }
         
+
+class NewsletterForm(forms.ModelForm):
+    class Meta:
+        model = Newsletter
+        fields = ['email']
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter your email',
+                'required': True
+            }),
+        }

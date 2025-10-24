@@ -1,9 +1,106 @@
-<footer class="footer">
-    <ul class="footer-menu">
-      <li><a href="#">Privacy Policy</a></li>
-      <li><a href="#">Terms of Service</a></li>
-      <li><a href="#">Help</a></li>
-      <li><a href="{% url 'contact:contact' %}">Contact</a></li>
-    </ul>
-    <div class="footer-copy">&copy; 2025 {{site_info.name}}. All rights reserved.</div>
+<footer class="footer bg-dark text-light py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <!-- Brand Section -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-blog me-2"></i>ModernBlog
+                </h5>
+                <p class="text-muted mb-3">
+                    A modern platform for sharing thoughts, ideas, and stories. 
+                    Connect with readers worldwide through engaging content.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-light me-3" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-light me-3" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-light me-3" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-light me-3" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="text-light" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="fw-bold mb-3">Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{% url 'main:home' %}" class="text-muted text-decoration-none">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'blog:list' %}" class="text-muted text-decoration-none">
+                            <i class="fas fa-newspaper me-2"></i>Blog
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'contact:contact' %}" class="text-muted text-decoration-none">
+                            <i class="fas fa-envelope me-2"></i>Contact
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">
+                            <i class="fas fa-info-circle me-2"></i>About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="fw-bold mb-3">Categories</h6>
+                <ul class="list-unstyled">
+                    {% for category in categories|slice:":5" %}
+                    <li class="mb-2">
+                        <a href="{% url 'blog:category_detail' category.slug %}" class="text-muted text-decoration-none">
+                            <i class="fas fa-tag me-2"></i>{{ category.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="fw-bold mb-3">Stay Updated</h6>
+                <p class="text-muted mb-3">
+                    Subscribe to our newsletter for the latest posts and updates.
+                </p>
+                <form method="post" action="{% url 'contact:newsletter' %}" class="newsletter-form">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Copyright -->
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-muted mb-0">
+                    &copy; {% now "Y" %} ModernBlog. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+            </div>
+        </div>
+    </div>
 </footer>

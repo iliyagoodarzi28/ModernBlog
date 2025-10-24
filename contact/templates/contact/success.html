@@ -1,82 +1,314 @@
 {% extends 'master.html' %}
-{% block title %}Message Sent{% endblock %}
+{% load static %}
+
+{% block title %}Message Sent - ModernBlog{% endblock %}
+
+{% block meta_description %}Thank you for contacting us! Your message has been sent successfully.{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-    <h1>✅ Thank You!</h1>
-    <p>Your message has been sent successfully. We will get back to you soon.</p>
-    <a href="{% url 'contact:contact' %}" class="btn btn-primary mt-3">Send Another Message</a>
-    <a href="{% url 'main:main' %}" class="btn btn-primary mt-3">Back To Home</a>
-    
-</div>
+<!-- Success Header -->
+<section class="success-header py-5 bg-gradient-success text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="success-icon mb-4">
+                    <i class="fas fa-check-circle fa-5x"></i>
+                </div>
+                <h1 class="display-4 fw-bold mb-4">Message Sent Successfully!</h1>
+                <p class="lead mb-0">
+                    Thank you for reaching out to us. We'll get back to you as soon as possible.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
+<!-- Success Content -->
+<section class="success-content py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="success-card card border-0 shadow-lg">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="fw-bold mb-4 text-success">
+                            <i class="fas fa-paper-plane me-2"></i>What happens next?
+                        </h3>
+                        
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <div class="step-item">
+                                    <div class="step-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                         style="width: 60px; height: 60px;">
+                                        <i class="fas fa-envelope fa-lg"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2">Message Received</h5>
+                                    <p class="text-muted mb-0">We've received your message and it's been logged in our system.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="step-item">
+                                    <div class="step-icon bg-info text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                         style="width: 60px; height: 60px;">
+                                        <i class="fas fa-user-check fa-lg"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2">Team Review</h5>
+                                    <p class="text-muted mb-0">Our team will review your message and prepare a response.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="step-item">
+                                    <div class="step-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                         style="width: 60px; height: 60px;">
+                                        <i class="fas fa-reply fa-lg"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2">Response Sent</h5>
+                                    <p class="text-muted mb-0">You'll receive a response within 24 hours during business days.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="response-time-info bg-light rounded p-4 mb-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-clock me-2 text-warning"></i>Response Time
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="time-item">
+                                        <strong>General Inquiries:</strong>
+                                        <span class="text-muted">Within 24 hours</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="time-item">
+                                        <strong>Technical Support:</strong>
+                                        <span class="text-muted">Within 12 hours</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="time-item">
+                                        <strong>Feature Requests:</strong>
+                                        <span class="text-muted">Within 48 hours</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="time-item">
+                                        <strong>Bug Reports:</strong>
+                                        <span class="text-muted">Within 6 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{% url 'main:home' %}" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                            <a href="{% url 'contact:contact' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-envelope me-2"></i>Send Another Message
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Resources -->
+                <div class="resources-section mt-5">
+                    <h4 class="fw-bold text-center mb-4">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>While You Wait
+                    </h4>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="resource-card card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="resource-icon mb-3">
+                                        <i class="fas fa-newspaper fa-3x text-primary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">Explore Our Blog</h5>
+                                    <p class="text-muted mb-3">Discover amazing content and insights from our community.</p>
+                                    <a href="{% url 'blog:list' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-arrow-right me-2"></i>Read Posts
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="resource-card card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="resource-icon mb-3">
+                                        <i class="fas fa-question-circle fa-3x text-info"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">Check Our FAQ</h5>
+                                    <p class="text-muted mb-3">Find quick answers to common questions.</p>
+                                    <a href="#" class="btn btn-outline-info">
+                                        <i class="fas fa-search me-2"></i>View FAQ
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
+{% block extra_css %}
 <style>
-    /*──────────────────────────────────────────────────────────────────────────────
-  Thank You Page Styles
-──────────────────────────────────────────────────────────────────────────────*/
-
-/* Container */
-.container.py-5.text-center {
-  max-width: 600px;
-  margin: 4rem auto;
-  padding: 3rem 2rem;
-  background: var(--bg-start);
-  border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  color: var(--text);
+.success-header {
+    background: linear-gradient(135deg, var(--success-color), #059669);
 }
 
-/* Heading */
-.container.py-5.text-center h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--accent);
-  line-height: 1.2;
+.bg-gradient-success {
+    background: linear-gradient(135deg, var(--success-color), #059669);
 }
 
-/* Message Text */
-.container.py-5.text-center p {
-  font-size: 1.125rem;
-  margin-bottom: 2rem;
-  color: var(--text);
-  line-height: 1.5;
+.success-icon {
+    animation: bounceIn 1s ease-out;
 }
 
-/* “Send Another Message” Button */
-.container.py-5.text-center .btn-primary {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: var(--accent);
-  color: #fff;
-  text-decoration: none;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.container.py-5.text-center .btn-primary:hover {
-  background: #ff7f7f;
+.success-card {
+    border-radius: var(--border-radius-lg);
+    animation: slideInUp 0.8s ease-out;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .container.py-5.text-center {
-    margin: 2rem 1rem;
-    padding: 2rem 1rem;
-  }
-
-  .container.py-5.text-center h1 {
-    font-size: 2rem;
-  }
-
-  .container.py-5.text-center p {
-    font-size: 1rem;
-  }
+@keyframes slideInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+.step-item {
+    transition: all 0.3s ease;
+}
+
+.step-item:hover {
+    transform: translateY(-5px);
+}
+
+.step-icon {
+    transition: all 0.3s ease;
+}
+
+.step-item:hover .step-icon {
+    transform: scale(1.1);
+}
+
+.response-time-info {
+    border-radius: var(--border-radius);
+}
+
+.time-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.time-item:last-child {
+    border-bottom: none;
+}
+
+.resource-card {
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-lg);
+}
+
+.resource-icon {
+    transition: all 0.3s ease;
+}
+
+.resource-card:hover .resource-icon {
+    transform: scale(1.1);
+}
+
+.action-buttons .btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+    }
+    
+    .step-item {
+        margin-bottom: 2rem;
+    }
+}
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add some interactive animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate step items on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationDelay = '0.2s';
+                entry.target.style.animation = 'slideInUp 0.6s ease-out forwards';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.step-item').forEach(item => {
+        observer.observe(item);
+    });
+    
+    // Add click tracking for analytics
+    document.querySelectorAll('a[href]').forEach(link => {
+        link.addEventListener('click', function() {
+            console.log('User clicked:', this.textContent.trim());
+        });
+    });
+});
+</script>
 {% endblock %}

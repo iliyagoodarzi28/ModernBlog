@@ -4,6 +4,8 @@ from .managers import ActiveManager , DeletedManager
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils.text import slugify
+from django.utils import timezone
 from .utils import blog_comment_info 
 
 
@@ -11,23 +13,30 @@ from .utils import blog_comment_info
 
 class BaseModel(models.Model):
     title = models.CharField(max_length=225 , verbose_name="Title")
-    slug = models.SlugField(default="", null=False , verbose_name="Slug")
+    slug = models.SlugField(max_length=255, unique=True, blank=True, verbose_name="Slug")
     img = models.ImageField(upload_to='uploads/%Y/%m/%d',blank=True,verbose_name="Image")
+    meta_description = models.CharField(max_length=160, blank=True, verbose_name="Meta Description")
+    meta_keywords = models.CharField(max_length=255, blank=True, verbose_name="Meta Keywords")
     is_deleted = models.BooleanField(default=False, verbose_name="Is Deleted")
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
-
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
     objects = models.Manager()
     active_objects = ActiveManager()
     delete_objects = DeletedManager()
     
-
     class Meta:
         abstract = True
-        ordering = ('title',)
+        ordering = ('-created_at',)
 
     def __str__(self):
-        return self.title    
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)    
 
     
 
@@ -48,31 +57,48 @@ class Category(BaseModel):
 
 class Blog(BaseModel):
     """
-    Base Model
+    Blog Model
     
     """
     category = models.ForeignKey(
         Category,on_delete=models.CASCADE,
-        related_name='Blogs',
+        related_name='blogs',
         verbose_name="Category"
     )
-    description = MarkdownxField()
-    date = models.DateTimeField(auto_now_add=True, verbose_name='Date')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blogs',
+        verbose_name="Author",
+        null=True,
+        blank=True
+    )
+    description = MarkdownxField(verbose_name="Content")
+    excerpt = models.TextField(max_length=500, blank=True, verbose_name="Excerpt")
     views = models.PositiveIntegerField(default=0, verbose_name='Views')
-
+    featured = models.BooleanField(default=False, verbose_name="Featured Post")
+    reading_time = models.PositiveIntegerField(default=0, verbose_name="Reading Time (minutes)")
 
     def increment_views(self):
         self.views += 1
-        self.save()
+        self.save(update_fields=['views'])
 
     def get_absolute_url(self):
         return reverse('blog:detail', kwargs={'slug': self.slug})
     
-
+    def get_excerpt(self):
+        if self.excerpt:
+            return self.excerpt
+        return self.description[:200] + "..." if len(self.description) > 200 else self.description
 
     class Meta(BaseModel.Meta):
         verbose_name = 'Blog'
         verbose_name_plural = 'Blogs'
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['category', '-created_at']),
+            models.Index(fields=['featured', '-created_at']),
+        ]
 
 
 

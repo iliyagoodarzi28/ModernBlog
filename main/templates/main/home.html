@@ -1,0 +1,564 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}ModernBlog - Where ideas live{% endblock %}
+
+{% block meta_description %}Discover stories, ideas, and perspectives from writers around the world. Join our community of thinkers and creators.{% endblock %}
+
+{% block content %}
+<!-- Hero Section - Medium-inspired -->
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title mb-4">
+                    Stay curious.
+                </h1>
+                <p class="hero-subtitle mb-5">
+                    Discover stories, thinking, and expertise from writers on any topic.
+                </p>
+                {% if not user.is_authenticated %}
+                <div class="hero-actions">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-lg rounded-pill px-4">
+                        Start reading
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trending Section -->
+<section class="trending-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-header mb-5">
+                    <h2 class="section-title fw-bold mb-3">Trending on ModernBlog</h2>
+                </div>
+                
+                {% if latest_blogs %}
+                <div class="trending-posts">
+                    {% for blog in latest_blogs|slice:":5" %}
+                    <div class="trending-post d-flex align-items-start mb-4">
+                        <div class="trending-number me-3">
+                            <span class="text-muted fw-bold">{{ forloop.counter|stringformat:"02d" }}</span>
+                        </div>
+                        <div class="trending-content flex-grow-1">
+                            <div class="trending-author mb-1">
+                                <small class="text-muted">
+                                    <img src="{% if blog.author.avatar %}{{ blog.author.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                         alt="{{ blog.author.username }}" class="rounded-circle me-2" width="20" height="20">
+                                    {{ blog.author.get_full_name|default:blog.author.username }} in {{ blog.category.title }}
+                                </small>
+                            </div>
+                            <h5 class="trending-title mb-2">
+                                <a href="{% url 'blog:detail' blog.slug %}" class="text-decoration-none text-dark fw-bold">
+                                    {{ blog.title }}
+                                </a>
+                            </h5>
+                            <div class="trending-meta">
+                                <small class="text-muted">{{ blog.created_at|date:"M d" }} · {{ blog.views }} views</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Stories Section -->
+<section class="stories-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-header mb-5">
+                    <h2 class="section-title fw-bold mb-3">Latest stories</h2>
+                </div>
+                
+                {% if latest_blogs %}
+                <div class="stories-grid">
+                    {% for blog in latest_blogs %}
+                    <article class="story-card mb-5">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="story-content">
+                                    <div class="story-author mb-2">
+                                        <img src="{% if blog.author.avatar %}{{ blog.author.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                             alt="{{ blog.author.username }}" class="rounded-circle me-2" width="24" height="24">
+                                        <small class="text-muted">{{ blog.author.get_full_name|default:blog.author.username }}</small>
+                                    </div>
+                                    <h3 class="story-title mb-2">
+                                        <a href="{% url 'blog:detail' blog.slug %}" class="text-decoration-none text-dark fw-bold">
+                                            {{ blog.title }}
+                                        </a>
+                                    </h3>
+                                    <p class="story-excerpt text-muted mb-3">
+                                        {{ blog.get_excerpt|truncatewords:25 }}
+                                    </p>
+                                    <div class="story-meta">
+                                        <small class="text-muted">{{ blog.created_at|date:"M d" }} · {{ blog.views }} views</small>
+                                        <span class="story-category ms-3">
+                                            <small class="text-muted">{{ blog.category.title }}</small>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if blog.img %}
+                            <div class="col-md-4">
+                                <div class="story-image">
+                                    <img src="{{ blog.img.url }}" alt="{{ blog.title }}" class="img-fluid rounded">
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a href="{% url 'blog:list' %}" class="btn btn-outline-dark rounded-pill px-4">
+                        See all stories
+                    </a>
+                </div>
+                
+                {% else %}
+                <div class="empty-state text-center py-5">
+                    <h4 class="text-muted mb-3">No stories yet</h4>
+                    <p class="text-muted mb-4">Be the first to share your story with the world.</p>
+                    {% if user.is_authenticated %}
+                    <a href="#" class="btn btn-dark rounded-pill px-4">Write your first story</a>
+                    {% else %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-dark rounded-pill px-4">Get started</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Topics Section -->
+<section class="topics-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-header mb-5">
+                    <h2 class="section-title fw-bold mb-3">Recommended topics</h2>
+                </div>
+                
+                {% if categories %}
+                <div class="topics-grid">
+                    {% for category in categories|slice:":6" %}
+                    <div class="topic-card">
+                        <a href="{% url 'blog:category_detail' category.slug %}" class="text-decoration-none">
+                            <h6 class="topic-title fw-bold text-dark mb-2">{{ category.title }}</h6>
+                            <p class="topic-description text-muted small mb-0">{{ category.description|truncatewords:15 }}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'blog:categories' %}" class="btn btn-outline-dark rounded-pill px-4">
+                        See all topics
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    padding: 6rem 0 4rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.trending-section {
+    background-color: var(--background-secondary);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.trending-post {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.trending-post:last-child {
+    border-bottom: none;
+}
+
+.trending-number {
+    font-size: 1.25rem;
+    min-width: 2rem;
+}
+
+.trending-title a {
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.trending-title a:hover {
+    color: var(--accent-color);
+}
+
+.story-card {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.story-card:last-child {
+    border-bottom: none;
+}
+
+.story-title a {
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+
+.story-title a:hover {
+    color: var(--accent-color);
+}
+
+.story-excerpt {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.story-image img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.topic-card {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.topic-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.topic-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.topic-card:hover .topic-title {
+    color: var(--accent-color);
+}
+
+.empty-state {
+    padding: 4rem 2rem;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .trending-post {
+        flex-direction: column;
+    }
+    
+    .trending-number {
+        margin-bottom: 0.5rem;
+    }
+    
+    .story-card .row {
+        flex-direction: column-reverse;
+    }
+    
+    .story-image {
+        margin-bottom: 1rem;
+    }
+    
+    .topics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold mb-3">Why Choose ModernBlog?</h2>
+                <p class="lead text-muted">Experience the future of blogging with our cutting-edge features</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-pen-fancy fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Easy Writing</h5>
+                        <p class="card-text text-muted">
+                            Write and publish your posts with our intuitive editor. 
+                            Focus on your content while we handle the technical details.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-users fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Community</h5>
+                        <p class="card-text text-muted">
+                            Connect with readers and writers from around the world. 
+                            Build your audience and grow your influence.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-mobile-alt fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Mobile First</h5>
+                        <p class="card-text text-muted">
+                            Access your blog anywhere, anytime. Our responsive design 
+                            ensures a perfect experience on all devices.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-search fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Smart Search</h5>
+                        <p class="card-text text-muted">
+                            Find exactly what you're looking for with our intelligent 
+                            search system and content categorization.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-shield-alt fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Secure & Fast</h5>
+                        <p class="card-text text-muted">
+                            Your content is safe with enterprise-grade security. 
+                            Enjoy lightning-fast loading times and 99.9% uptime.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-chart-line fa-3x text-secondary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Analytics</h5>
+                        <p class="card-text text-muted">
+                            Track your success with detailed analytics. 
+                            Understand your audience and optimize your content.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Posts Section -->
+<section class="latest-posts-section py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">Latest Posts</h2>
+                <p class="lead text-muted">Discover what our community is writing about</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for blog in latest_blogs %}
+            <div class="col-lg-4 col-md-6">
+                <article class="post-card card h-100 border-0 shadow-sm">
+                    {% if blog.img %}
+                    <div class="post-image">
+                        <img src="{{ blog.img.url }}" alt="{{ blog.title }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <div class="post-meta mb-2">
+                            <span class="badge bg-primary me-2">{{ blog.category.title }}</span>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ blog.created_at|date:"M d, Y" }}
+                            </small>
+                        </div>
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'blog:detail' blog.slug %}" class="text-decoration-none text-dark">
+                                {{ blog.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted flex-grow-1">
+                            {{ blog.get_excerpt|truncatewords:20 }}
+                        </p>
+                        <div class="post-footer d-flex justify-content-between align-items-center">
+                            <div class="post-stats">
+                                <small class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>{{ blog.views }} views
+                                </small>
+                            </div>
+                            <a href="{% url 'blog:detail' blog.slug %}" class="btn btn-outline-primary btn-sm">
+                                Read More <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="empty-state">
+                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No posts yet</h4>
+                    <p class="text-muted">Be the first to share your story!</p>
+                    {% if user.is_authenticated %}
+                    <a href="#" class="btn btn-primary">Create Your First Post</a>
+                    {% else %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary">Join Now</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if latest_blogs %}
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <a href="{% url 'blog:list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-newspaper me-2"></i>View All Posts
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">Explore Categories</h2>
+                <p class="lead text-muted">Find content that interests you</p>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            {% for category in categories %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{% url 'blog:category_detail' category.slug %}" class="category-card card border-0 shadow-sm text-decoration-none h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon mb-3">
+                            <i class="fas fa-tag fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="card-title fw-bold text-dark">{{ category.title }}</h6>
+                        <p class="card-text text-muted small">{{ category.description|truncatewords:10 }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="empty-state">
+                    <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No categories yet</h4>
+                    <p class="text-muted">Categories will appear here as content is created.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="display-6 fw-bold mb-3">Ready to Start Your Journey?</h2>
+                <p class="lead mb-0">
+                    Join our community today and start sharing your stories with the world. 
+                    It's free, easy, and takes just a few minutes to get started.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Get Started Now
+                </a>
+                {% else %}
+                <a href="{% url 'blog:list' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-newspaper me-2"></i>Explore Posts
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

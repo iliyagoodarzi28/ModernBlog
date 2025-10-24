@@ -1,16 +1,516 @@
-<!-- templates/accounts/profile_edit.html -->
-{% extends "master.html" %}
+{% extends 'master.html' %}
+{% load static %}
 
-{% block title %}Edit Profile{% endblock %}
+{% block title %}Edit Profile - ModernBlog{% endblock %}
 
+{% block meta_description %}Edit your ModernBlog profile information, update your bio, and manage your account settings.{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="mb-4">Edit Profile</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
-</div>
+<!-- Profile Edit Header -->
+<section class="profile-edit-header py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary me-3">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                    </a>
+                    <div>
+                        <h1 class="h3 fw-bold mb-0">Edit Profile</h1>
+                        <p class="text-muted mb-0">Update your profile information and settings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Profile Edit Form -->
+<section class="profile-edit-form py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-user me-2 text-primary"></i>Personal Information
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <!-- Avatar Upload -->
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Profile Picture</label>
+                                    <div class="avatar-upload d-flex align-items-center gap-4">
+                                        <div class="current-avatar">
+                                            {% if user.avatar %}
+                                            <img src="{{ user.avatar.url }}" alt="Current Avatar" 
+                                                 class="rounded-circle shadow" width="80" height="80">
+                                            {% else %}
+                                            <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                 style="width: 80px; height: 80px;">
+                                                <i class="fas fa-user fa-2x"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="avatar-upload-controls">
+                                            <input type="file" name="avatar" id="avatarInput" class="form-control" accept="image/*">
+                                            <div class="form-text">Upload a new profile picture (JPG, PNG, max 2MB)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Username -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-at me-2 text-primary"></i>{{ form.username.label }}
+                                    </label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">This will be your unique identifier</div>
+                                </div>
+                                
+                                <!-- Email -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>{{ form.email.label }}
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Full Name -->
+                                {% if form.full_name %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.full_name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-id-card me-2 text-primary"></i>{{ form.full_name.label }}
+                                    </label>
+                                    {{ form.full_name }}
+                                    {% if form.full_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.full_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Phone -->
+                                {% if form.phone %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-phone me-2 text-primary"></i>{{ form.phone.label }}
+                                    </label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.phone.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bio and About Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-quote-left me-2 text-success"></i>Bio & About
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label for="bio" class="form-label fw-semibold">
+                                    <i class="fas fa-user-edit me-2 text-success"></i>Bio
+                                </label>
+                                <textarea name="bio" id="bio" class="form-control" rows="4" 
+                                          placeholder="Tell us about yourself...">{{ user.bio|default:"" }}</textarea>
+                                <div class="form-text">Share a brief description about yourself (max 500 characters)</div>
+                                <div class="character-count text-end">
+                                    <small class="text-muted">
+                                        <span id="bioCount">0</span>/500 characters
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="website" class="form-label fw-semibold">
+                                    <i class="fas fa-globe me-2 text-info"></i>Website
+                                </label>
+                                <input type="url" name="website" id="website" class="form-control" 
+                                       placeholder="https://yourwebsite.com" value="{{ user.website|default:"" }}">
+                                <div class="form-text">Link to your personal website or blog</div>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="location" class="form-label fw-semibold">
+                                        <i class="fas fa-map-marker-alt me-2 text-warning"></i>Location
+                                    </label>
+                                    <input type="text" name="location" id="location" class="form-control" 
+                                           placeholder="City, Country" value="{{ user.location|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="birth_date" class="form-label fw-semibold">
+                                        <i class="fas fa-birthday-cake me-2 text-danger"></i>Birth Date
+                                    </label>
+                                    <input type="date" name="birth_date" id="birth_date" class="form-control" 
+                                           value="{{ user.birth_date|default:"" }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-share-alt me-2 text-info"></i>Social Media Links
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="twitter" class="form-label fw-semibold">
+                                        <i class="fab fa-twitter me-2 text-primary"></i>Twitter
+                                    </label>
+                                    <input type="url" name="twitter" id="twitter" class="form-control" 
+                                           placeholder="https://twitter.com/username" value="{{ user.twitter|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="facebook" class="form-label fw-semibold">
+                                        <i class="fab fa-facebook me-2 text-primary"></i>Facebook
+                                    </label>
+                                    <input type="url" name="facebook" id="facebook" class="form-control" 
+                                           placeholder="https://facebook.com/username" value="{{ user.facebook|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="instagram" class="form-label fw-semibold">
+                                        <i class="fab fa-instagram me-2 text-danger"></i>Instagram
+                                    </label>
+                                    <input type="url" name="instagram" id="instagram" class="form-control" 
+                                           placeholder="https://instagram.com/username" value="{{ user.instagram|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="linkedin" class="form-label fw-semibold">
+                                        <i class="fab fa-linkedin me-2 text-primary"></i>LinkedIn
+                                    </label>
+                                    <input type="url" name="linkedin" id="linkedin" class="form-control" 
+                                           placeholder="https://linkedin.com/in/username" value="{{ user.linkedin|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="github" class="form-label fw-semibold">
+                                        <i class="fab fa-github me-2 text-dark"></i>GitHub
+                                    </label>
+                                    <input type="url" name="github" id="github" class="form-control" 
+                                           placeholder="https://github.com/username" value="{{ user.github|default:"" }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="youtube" class="form-label fw-semibold">
+                                        <i class="fab fa-youtube me-2 text-danger"></i>YouTube
+                                    </label>
+                                    <input type="url" name="youtube" id="youtube" class="form-control" 
+                                           placeholder="https://youtube.com/channel/username" value="{{ user.youtube|default:"" }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Settings Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="fw-bold mb-0">
+                                <i class="fas fa-shield-alt me-2 text-warning"></i>Privacy Settings
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="profile_public" 
+                                               id="profilePublic" {% if user.profile_public %}checked{% endif %}>
+                                        <label class="form-check-label fw-semibold" for="profilePublic">
+                                            Public Profile
+                                        </label>
+                                        <div class="form-text">Allow others to view your profile and posts</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="show_email" 
+                                               id="showEmail" {% if user.show_email %}checked{% endif %}>
+                                        <label class="form-check-label fw-semibold" for="showEmail">
+                                            Show Email Address
+                                        </label>
+                                        <div class="form-text">Display your email address on your profile</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="allow_messages" 
+                                               id="allowMessages" {% if user.allow_messages %}checked{% endif %}>
+                                        <label class="form-check-label fw-semibold" for="allowMessages">
+                                            Allow Direct Messages
+                                        </label>
+                                        <div class="form-text">Let other users send you direct messages</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="form-actions d-flex justify-content-between align-items-center">
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-outline-danger me-2" onclick="resetForm()">
+                                <i class="fas fa-undo me-2"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-edit-header {
+    background: linear-gradient(135deg, var(--gray-100), #ffffff);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.card {
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--box-shadow-lg);
+}
+
+.form-control {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.avatar-upload {
+    padding: 1rem;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.avatar-upload:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.current-avatar img,
+.avatar-placeholder {
+    transition: transform 0.3s ease;
+}
+
+.current-avatar:hover img,
+.current-avatar:hover .avatar-placeholder {
+    transform: scale(1.05);
+}
+
+.character-count {
+    margin-top: 0.5rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-actions {
+    padding: 2rem 0;
+    border-top: 1px solid var(--gray-200);
+}
+
+.action-buttons .btn {
+    min-width: 120px;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .form-actions .action-buttons {
+        width: 100%;
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .form-actions .action-buttons .btn {
+        flex: 1;
+    }
+    
+    .avatar-upload {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Character counter for bio
+document.addEventListener('DOMContentLoaded', function() {
+    const bioTextarea = document.getElementById('bio');
+    const bioCount = document.getElementById('bioCount');
+    
+    if (bioTextarea && bioCount) {
+        bioTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            bioCount.textContent = count;
+            
+            if (count > 500) {
+                bioCount.classList.add('text-danger');
+                bioTextarea.classList.add('is-invalid');
+            } else {
+                bioCount.classList.remove('text-danger');
+                bioTextarea.classList.remove('is-invalid');
+            }
+        });
+        
+        // Initial count
+        bioTextarea.dispatchEvent(new Event('input'));
+    }
+    
+    // Avatar preview
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const currentAvatar = document.querySelector('.current-avatar img');
+                    if (currentAvatar) {
+                        currentAvatar.src = e.target.result;
+                    } else {
+                        const placeholder = document.querySelector('.avatar-placeholder');
+                        if (placeholder) {
+                            placeholder.innerHTML = `<img src="${e.target.result}" alt="Preview" class="rounded-circle" width="80" height="80">`;
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input[required], textarea[required]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim() !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+});
+
+function resetForm() {
+    if (confirm('Are you sure you want to reset all changes? This action cannot be undone.')) {
+        document.querySelector('form').reset();
+        
+        // Reset character count
+        const bioCount = document.getElementById('bioCount');
+        if (bioCount) {
+            bioCount.textContent = '0';
+            bioCount.classList.remove('text-danger');
+        }
+        
+        // Reset avatar preview
+        const avatarInput = document.getElementById('avatarInput');
+        if (avatarInput) {
+            avatarInput.value = '';
+        }
+        
+        // Remove validation classes
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.classList.remove('is-valid', 'is-invalid');
+        });
+        
+        showNotification('Form has been reset', 'info');
+    }
+}
+
+// URL validation for social media links
+document.addEventListener('DOMContentLoaded', function() {
+    const urlInputs = document.querySelectorAll('input[type="url"]');
+    
+    urlInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && !isValidUrl(this.value)) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+});
+
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+</script>
 {% endblock %}
