@@ -28,7 +28,8 @@ urlpatterns = [
     path('markdownx/', include('markdownx.urls')),
     path('contact/', include('contact.urls', namespace='contact')),
     path('accounts/', include('accounts.urls')),
-
+    # Django Allauth URLs - using different path to avoid conflicts
+    path('auth/', include('allauth.urls')),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

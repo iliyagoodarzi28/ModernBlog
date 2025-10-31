@@ -1,0 +1,373 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Account Settings - ModernBlog{% endblock %}
+
+{% block meta_description %}Manage your ModernBlog account settings, privacy preferences, and security options.{% endblock %}
+
+{% block content %}
+<!-- Account Settings Header -->
+<section class="settings-header py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary me-3">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                    </a>
+                    <div>
+                        <h1 class="h3 fw-bold mb-0">Account Settings</h1>
+                        <p class="text-muted mb-0">Manage your account preferences and security</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Account Settings Content -->
+<section class="settings-content py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                
+                <!-- Account Information Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-user me-2 text-primary"></i>Account Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Email Address</label>
+                                    <p class="fw-semibold mb-0">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Username</label>
+                                    <p class="fw-semibold mb-0">@{{ user.username }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Member Since</label>
+                                    <p class="fw-semibold mb-0">{{ user.date_joined|date:"F d, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Last Login</label>
+                                    <p class="fw-semibold mb-0">{{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Account Status</label>
+                                    <div class="d-flex align-items-center">
+                                        {% if user.is_verified %}
+                                        <span class="badge bg-success me-2">Verified</span>
+                                        {% else %}
+                                        <span class="badge bg-warning me-2">Unverified</span>
+                                        {% endif %}
+                                        {% if user.is_premium %}
+                                        <span class="badge bg-primary">Premium</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="text-muted small">Account Age</label>
+                                    <p class="fw-semibold mb-0">{{ account_age }} days</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-shield-alt me-2 text-success"></i>Security Settings
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="security-item">
+                                    <h6 class="fw-semibold">Password</h6>
+                                    <p class="text-muted small mb-2">Last changed: Never</p>
+                                    <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-key me-1"></i>Change Password
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="security-item">
+                                    <h6 class="fw-semibold">Email Address</h6>
+                                    <p class="text-muted small mb-2">Primary: {{ user.email }}</p>
+                                    <a href="{% url 'accounts:email_change' %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i>Change Email
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-eye me-2 text-info"></i>Privacy Settings
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="privacy-settings">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="profilePublic" 
+                                       {% if user.profile_public %}checked{% endif %}
+                                       onchange="togglePrivacy()">
+                                <label class="form-check-label fw-semibold" for="profilePublic">
+                                    Public Profile
+                                </label>
+                                <div class="form-text">Allow others to view your profile and posts</div>
+                            </div>
+                            
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="showEmail" 
+                                       {% if user.show_email %}checked{% endif %}
+                                       onchange="toggleEmailVisibility()">
+                                <label class="form-check-label fw-semibold" for="showEmail">
+                                    Show Email Address
+                                </label>
+                                <div class="form-text">Display your email address on your profile</div>
+                            </div>
+                            
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="allowMessages" 
+                                       {% if user.allow_messages %}checked{% endif %}
+                                       onchange="toggleMessages()">
+                                <label class="form-check-label fw-semibold" for="allowMessages">
+                                    Allow Direct Messages
+                                </label>
+                                <div class="form-text">Let other users send you direct messages</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Actions Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-cog me-2 text-warning"></i>Account Actions
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="action-item">
+                                    <h6 class="fw-semibold">Export Data</h6>
+                                    <p class="text-muted small mb-2">Download a copy of your account data</p>
+                                    <button class="btn btn-outline-info btn-sm" onclick="exportData()">
+                                        <i class="fas fa-download me-1"></i>Export Data
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="action-item">
+                                    <h6 class="fw-semibold">Account Deactivation</h6>
+                                    <p class="text-muted small mb-2">Temporarily disable your account</p>
+                                    <a href="{% url 'accounts:account_deactivation' %}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-user-times me-1"></i>Deactivate Account
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Card -->
+                <div class="card border-danger mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="danger-actions">
+                            <div class="mb-3">
+                                <h6 class="fw-semibold text-danger">Delete Account</h6>
+                                <p class="text-muted small mb-2">
+                                    Permanently delete your account and all associated data. This action cannot be undone.
+                                </p>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAccount()">
+                                    <i class="fas fa-trash me-1"></i>Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.settings-header {
+    background: linear-gradient(135deg, var(--gray-100), #ffffff);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.card {
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--box-shadow-lg);
+}
+
+.info-item {
+    padding: 0.5rem 0;
+}
+
+.security-item, .action-item {
+    padding: 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.security-item:hover, .action-item:hover {
+    background-color: var(--gray-50);
+    border-color: var(--primary-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.privacy-settings .form-check {
+    padding: 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.privacy-settings .form-check:hover {
+    background-color: var(--gray-50);
+    border-color: var(--primary-color);
+}
+
+.danger-actions {
+    background-color: rgba(220, 53, 69, 0.05);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+}
+
+@media (max-width: 768px) {
+    .settings-header .d-flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .settings-header .btn {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePrivacy() {
+    const checkbox = document.getElementById('profilePublic');
+    const isPublic = checkbox.checked;
+    
+    // Send AJAX request to update privacy setting
+    fetch('{% url "accounts:toggle_privacy" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'is_public': isPublic
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showNotification(`Profile is now ${isPublic ? 'public' : 'private'}`, 'success');
+        } else {
+            showNotification('Failed to update privacy setting', 'error');
+            checkbox.checked = !isPublic; // Revert checkbox
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Failed to update privacy setting', 'error');
+        checkbox.checked = !isPublic; // Revert checkbox
+    });
+}
+
+function toggleEmailVisibility() {
+    // Implement email visibility toggle
+    console.log('Toggle email visibility');
+}
+
+function toggleMessages() {
+    // Implement messages toggle
+    console.log('Toggle messages');
+}
+
+function exportData() {
+    // Implement data export
+    showNotification('Data export feature coming soon', 'info');
+}
+
+function deleteAccount() {
+    if (confirm('Are you sure you want to permanently delete your account? This action cannot be undone.')) {
+        if (confirm('This will permanently delete all your data. Are you absolutely sure?')) {
+            // Implement account deletion
+            showNotification('Account deletion feature coming soon', 'warning');
+        }
+    }
+}
+
+function showNotification(message, type) {
+    // Simple notification system
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

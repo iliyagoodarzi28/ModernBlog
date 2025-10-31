@@ -25,6 +25,36 @@
                             </button>
                         </div>
                     </form>
+                    
+                    <!-- Search Filters -->
+                    <div class="search-filters mt-3">
+                        <div class="row g-2 justify-content-center">
+                            <div class="col-auto">
+                                <select name="category" class="form-select form-select-sm">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+                                        {{ category.title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <select name="sort" class="form-select form-select-sm">
+                                    <option value="">Sort by</option>
+                                    <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Newest</option>
+                                    <option value="old" {% if request.GET.sort == 'old' %}selected{% endif %}>Oldest</option>
+                                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                                    <option value="trending" {% if request.GET.sort == 'trending' %}selected{% endif %}>Trending</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-filter me-1"></i>Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,7 +175,7 @@
                         <h3 class="fw-bold mb-3">No stories yet</h3>
                         <p class="text-muted mb-4">Be the first to share your story with the community.</p>
                         {% if user.is_authenticated %}
-                        <a href="#" class="btn btn-dark btn-lg rounded-pill px-4">
+                        <a href="{% url 'blog:create' %}" class="btn btn-dark btn-lg rounded-pill px-4">
                             <i class="fas fa-plus me-2"></i>Write your first story
                         </a>
                         {% else %}

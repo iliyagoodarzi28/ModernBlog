@@ -1,4 +1,4 @@
-asgiref==3.9.1
+asgiref==3.10.0
 Django==5.2.4
 django-jazzmin==3.0.1
 django-markdownx==4.0.9
@@ -7,3 +7,6 @@ Markdown==3.8.2
 pillow==11.3.0
 sqlparse==0.5.3
 tzdata==2025.2
+django-allauth==65.10.0
+bleach==6.2.0
+webencodings==0.5.1

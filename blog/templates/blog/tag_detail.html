@@ -1,0 +1,446 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}{{ tag.name }} - Tags - ModernBlog{% endblock %}
+
+{% block meta_description %}Explore posts tagged with {{ tag.name }}. Discover related content and ideas.{% endblock %}
+
+{% block content %}
+<!-- Tag Header -->
+<section class="tag-header py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'main:home' %}" class="text-decoration-none text-muted">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'blog:list' %}" class="text-decoration-none text-muted">Stories</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Tags</li>
+                    </ol>
+                </nav>
+
+                <!-- Tag Info -->
+                <div class="tag-info">
+                    <div class="tag-badge mb-3">
+                        <span class="tag-item-large" style="background-color: {{ tag.color }};">
+                            <i class="fas fa-tag me-2"></i>{{ tag.name }}
+                        </span>
+                    </div>
+                    
+                    {% if tag.description %}
+                    <p class="tag-description text-muted mb-4">{{ tag.description }}</p>
+                    {% endif %}
+                    
+                    <div class="tag-stats">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-auto">
+                                <div class="stat-item">
+                                    <div class="stat-number">{{ blogs.paginator.count }}</div>
+                                    <div class="stat-label">Posts</div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="stat-item">
+                                    <div class="stat-number">{{ tag.usage_count }}</div>
+                                    <div class="stat-label">Total Usage</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Posts Grid -->
+<section class="tag-posts py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Posts List -->
+            <div class="col-lg-8">
+                {% if blogs %}
+                    <div class="posts-header mb-4">
+                        <h2 class="fw-bold mb-3">Posts tagged with "{{ tag.name }}"</h2>
+                        <p class="text-muted">{{ blogs.paginator.count }} post{{ blogs.paginator.count|pluralize }} found</p>
+                    </div>
+
+                    <div class="posts-grid">
+                        {% for blog in blogs %}
+                        <article class="post-card mb-5">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="post-content">
+                                        <!-- Author Info -->
+                                        <div class="post-author mb-3">
+                                            <div class="d-flex align-items-center">
+                                                {% if blog.author.avatar %}
+                                                <img src="{{ blog.author.avatar.url }}" alt="{{ blog.author.username }}" 
+                                                     class="rounded-circle me-2" width="24" height="24">
+                                                {% else %}
+                                                <div class="author-avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                     style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                                    {{ blog.author.username|first|upper }}
+                                                </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="author-name fw-bold">{{ blog.author.get_full_name|default:blog.author.username }}</div>
+                                                    <div class="post-date text-muted">{{ blog.created_at|date:"M d, Y" }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Post Title -->
+                                        <h3 class="post-title fw-bold mb-3">
+                                            <a href="{% url 'blog:detail' blog.slug %}" class="text-decoration-none text-dark">
+                                                {{ blog.title }}
+                                            </a>
+                                        </h3>
+
+                                        <!-- Post Excerpt -->
+                                        <p class="post-excerpt text-muted mb-3">
+                                            {{ blog.get_excerpt|truncatewords:30 }}
+                                        </p>
+
+                                        <!-- Post Meta -->
+                                        <div class="post-meta d-flex align-items-center gap-3">
+                                            <span class="badge bg-light text-dark">{{ blog.category.title }}</span>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>{{ blog.reading_time }} min read
+                                            </small>
+                                            <small class="text-muted">
+                                                <i class="fas fa-eye me-1"></i>{{ blog.views }} views
+                                            </small>
+                                            {% if blog.like_count > 0 %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-heart me-1"></i>{{ blog.like_count }} likes
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if blog.img %}
+                                <div class="col-md-4">
+                                    <div class="post-image">
+                                        <a href="{% url 'blog:detail' blog.slug %}">
+                                            <img src="{{ blog.img.url }}" alt="{{ blog.title }}" 
+                                                 class="img-fluid rounded">
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if blogs.has_other_pages %}
+                    <nav aria-label="Posts pagination" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            {% if blogs.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">&laquo; First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ blogs.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ blogs.number }} of {{ blogs.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if blogs.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ blogs.next_page_number }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ blogs.paginator.num_pages }}">Last &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state text-center py-5">
+                        <div class="empty-icon mb-4">
+                            <i class="fas fa-tag fa-3x text-muted"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No posts found</h3>
+                        <p class="text-muted mb-4">No posts are currently tagged with "{{ tag.name }}".</p>
+                        <a href="{% url 'blog:list' %}" class="btn btn-dark btn-lg rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Browse all posts
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <!-- Related Tags -->
+                    {% if related_tags %}
+                    <div class="sidebar-widget mb-5">
+                        <h5 class="widget-title fw-bold mb-4">Related Tags</h5>
+                        <div class="tags-list">
+                            {% for related_tag in related_tags %}
+                            <a href="{% url 'blog:tag_detail' related_tag.slug %}" 
+                               class="tag-item me-2 mb-2" style="background-color: {{ related_tag.color }};">
+                                {{ related_tag.name }}
+                                <span class="tag-count">{{ related_tag.usage_count }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Popular Posts -->
+                    <div class="sidebar-widget mb-5">
+                        <h5 class="widget-title fw-bold mb-4">Popular Posts</h5>
+                        <div class="popular-posts">
+                            {% for popular_blog in tag.get_popular_posts %}
+                            <div class="popular-post mb-3">
+                                <h6 class="popular-title fw-bold mb-1">
+                                    <a href="{% url 'blog:detail' popular_blog.slug %}" 
+                                       class="text-decoration-none text-dark">
+                                        {{ popular_blog.title|truncatewords:8 }}
+                                    </a>
+                                </h6>
+                                <div class="popular-meta text-muted small">
+                                    {{ popular_blog.created_at|date:"M d" }} · {{ popular_blog.views }} views
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Tag Statistics -->
+                    <div class="sidebar-widget">
+                        <div class="tag-stats-widget bg-light p-4 rounded">
+                            <h5 class="fw-bold mb-3">Tag Statistics</h5>
+                            <div class="stats-list">
+                                <div class="stat-item d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Total Posts:</span>
+                                    <span class="fw-bold">{{ tag.usage_count }}</span>
+                                </div>
+                                <div class="stat-item d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Created:</span>
+                                    <span class="fw-bold">{{ tag.created_at|date:"M Y" }}</span>
+                                </div>
+                                <div class="stat-item d-flex justify-content-between">
+                                    <span class="text-muted">Color:</span>
+                                    <span class="fw-bold" style="color: {{ tag.color }};">{{ tag.color }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.tag-header {
+    background: linear-gradient(135deg, var(--gray-100), #ffffff);
+}
+
+.tag-badge {
+    display: inline-block;
+}
+
+.tag-item-large {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tag-description {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.tag-stats {
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-card {
+    transition: all 0.3s ease;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.post-card:last-child {
+    border-bottom: none;
+}
+
+.post-card:hover {
+    background-color: var(--gray-50);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 0 -1rem 2rem -1rem;
+}
+
+.post-title a {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+.post-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-image img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.post-image:hover img {
+    transform: scale(1.05);
+}
+
+.sidebar {
+    padding-left: 2rem;
+}
+
+.sidebar-widget {
+    background-color: var(--background-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.widget-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.tag-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.tag-count {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 0.125rem 0.375rem;
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.popular-post {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.popular-post:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.popular-title a {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+.popular-title a:hover {
+    color: var(--accent-color);
+}
+
+.tag-stats-widget {
+    background-color: var(--gray-50) !important;
+    border: 1px solid var(--border-color);
+}
+
+.empty-state {
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        padding-left: 0;
+        margin-top: 3rem;
+    }
+    
+    .post-card:hover {
+        margin: 0;
+        padding: 1.5rem 0;
+    }
+    
+    .post-title a {
+        font-size: 1.25rem;
+    }
+    
+    .post-image img {
+        height: 200px;
+        margin-top: 1rem;
+    }
+}
+</style>
+{% endblock %}

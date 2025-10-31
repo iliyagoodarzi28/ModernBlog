@@ -1,0 +1,197 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Change Email Address - ModernBlog{% endblock %}
+
+{% block meta_description %}Change your email address for your ModernBlog account.{% endblock %}
+
+{% block content %}
+<!-- Email Change -->
+<section class="email-change py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="email-icon mb-3">
+                                <i class="fas fa-envelope fa-3x text-primary"></i>
+                            </div>
+                            <h2 class="fw-bold mb-2">Change Email Address</h2>
+                            <p class="text-muted">Update your email address for account notifications and login</p>
+                        </div>
+
+                        <!-- Current Email Display -->
+                        <div class="current-email mb-4">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Current Email:</strong> {{ user.email }}
+                            </div>
+                        </div>
+
+                        <!-- Email Change Form -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- New Email Field -->
+                            <div class="mb-4">
+                                <label for="{{ form.new_email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>New Email Address
+                                </label>
+                                {{ form.new_email }}
+                                {% if form.new_email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.new_email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.new_email.help_text %}
+                                    <div class="form-text">{{ form.new_email.help_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Current Password Field -->
+                            <div class="mb-4">
+                                <label for="{{ form.current_password.id_for_label }}" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Current Password
+                                </label>
+                                {{ form.current_password }}
+                                {% if form.current_password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.current_password.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.current_password.help_text %}
+                                    <div class="form-text">{{ form.current_password.help_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Security Notice -->
+                            <div class="security-notice mb-4">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Security Notice:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>You will need to verify your new email address</li>
+                                        <li>Your current email will remain active until verification</li>
+                                        <li>All notifications will be sent to your new email after verification</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Update Email Address
+                                </button>
+                                <a href="{% url 'accounts:account_settings' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Settings
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Additional Information -->
+                        <div class="mt-4 pt-4 border-top">
+                            <h6 class="fw-semibold mb-3">Important Information:</h6>
+                            <ul class="list-unstyled small text-muted">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Email changes require password confirmation
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Verification email will be sent to new address
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Account remains secure during transition
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Contact support if you don't receive verification email
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.email-change .card {
+    border-radius: 15px;
+}
+
+.email-change .email-icon {
+    opacity: 0.8;
+}
+
+.email-change .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.email-change .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.email-change .btn {
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.email-change .btn-primary {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    border: none;
+}
+
+.email-change .btn-primary:hover {
+    background: linear-gradient(135deg, #0b5ed7, #0a58ca);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.email-change .alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.email-change .security-notice .alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-left: 4px solid #ffc107;
+}
+
+.email-change .current-email .alert-info {
+    background: linear-gradient(135deg, #d1ecf1, #a8e6cf);
+    border-left: 4px solid #17a2b8;
+}
+
+.email-change .list-unstyled li {
+    padding: 4px 0;
+}
+
+.email-change .form-text {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.email-change .invalid-feedback {
+    font-size: 14px;
+    margin-top: 5px;
+}
+</style>
+{% endblock %}
